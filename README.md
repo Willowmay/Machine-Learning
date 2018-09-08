@@ -1,6 +1,6 @@
 # Machine-Learning
 
-In 2018 summer, I finished machine learning class in Columbia University successfully with the highest score in my class. 
+In 2018 summer, I finished machine learning class in Columbia University successfully with the highest score in class. 
 A year ago, I am a new student with little programming knowledge, but now I feel very comfortable with data and always be
 suprised by looking into history data will shed light on new thoughts and impactful future.
 
