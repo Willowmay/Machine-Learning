@@ -2,7 +2,7 @@
 
 In 2018 summer, I finished machine learning class in Columbia University successfully with the highest score in my class. 
 A year ago, I am a new student with little programming knowledge, but now I feel very comfortable with data and always be
-suprised by looking into history data will shed light on impactful future.
+suprised by looking into history data will shed light on new thoughts and impactful future.
 
 There is a saying from movie Man of Steel, "People are afraid of what they don't understand". 
 At the beginning it happened to me. However, I felt more and more confident after I kept learning and exercising.
