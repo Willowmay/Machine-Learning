@@ -6,7 +6,7 @@ suprised by looking into history data will shed light on impactful future.
 
 There is a saying from movie Man of Steel, "People are afraid of what they don't understand". 
 At the beginning it happened to me. However, I felt more and more confident after I kept learning and exercising.
-I have always been fascinated with interesting things, and would willing to try confidently to understand why and get solutions. 
+I have always been fascinated with interesting things, and want to understand why and get solutions. 
 That is how I start.
 
 Hope my machine learning project and experience of learning would be helpful for you! 
