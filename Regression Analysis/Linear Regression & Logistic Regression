@@ -1,0 +1,77 @@
+
+
+object.size(cats) # determine the size of dataset
+which(is.na(cats)) # identify the location or the number of NAs 
+rcats <- cats[sample(nrow(cats)), ] # randomize the order, shuffle row-wise 
+
+# Create a scatterplot of heart weight versus body weight
+scatterplot( Hwt ~ Bwt, data = cats) 
+
+## Simple linear regression may be a good fit since there seems a line shaped by data. 
+## I think data satisfy the assumption of linear regression pretty well, 
+## most of them are gathered and around the straight line.
+
+
+mod<- lm( Hwt ~ Bwt, data = cats)
+summary(mod) # the residual standard error, coefficients and intrecept with equation
+summary(mod)$r.squared # the coefficient of determinations
+
+## linear regression equation: Heart weight= -0.357 + 4.0341 × Body weight
+
+## Interpretation: For an increment of 1 kg in body weight in a cat, the heart weight would increase by 4.034 g. 
+## And if the cat weight is 0, the weight would be -0.3567, which is out of the data range we are discussing.
+## Since the p-value is much less than 0.05, we reject the null hypothesis that β = 0. 
+## Hence there is a significant relationship between the variables (Heart weight and Body weight) 
+## in the linear regression model of the data set "cats".
+
+## The residual standard error is 1.452 on 142 degrees of freedom. 
+## RSE as a judgement value of the Standard Deviation of an error term independent of body weight here. 
+## 1.452 is a small number and we could say that the model fits the data.
+
+## The coefficient of determinations is 0.6466209, so the data are 64.66209% close to the fitted regression line. 
+## The higher the R-squared, the better the model fits data. 
+
+cats$Sex_f <- factor(cats$Sex)
+contrasts(cats$Sex_f) # assigne 0 for female and 1 for male
+
+set.seed(101) # set the seed to make 70% partition reproducible
+inTrain <- createDataPartition(y = cats$Sex_f, p = .70, list = FALSE)
+train_cats <- cats[inTrain,]
+test_cats <- cats[-inTrain,]
+
+dim(train_cats) # identify numbers of observations the training and testing datasets have
+dim(test_cats)
+## From the environment, training dataset has 100 observations and testing dataset has 44 observations
+
+-------
+
+# Logistic regression with body weight and height as predictors
+log_cats <- glm(Sex_f~Bwt+Hwt,family=binomial(link='logit'), data=train_cats) 
+summary(log_cats)
+
+# Estimate the success rate of prediction
+cats_prob = predict(log_cats, test_cats, type="response")
+cats_pred = rep("F", dim(train_cats)[1])
+cats_pred[cats_prob > .5] = "M"
+table(cats_pred, train_cats$Sex_f)
+
+mean(cats_pred == train_cats$Sex_f) 
+*AIC: 96.063 Residual deviance:  90.126 Body weight is more significantlly important compared to height.*
+*The success rate of our predication is 57.42574%*
+
+# Logistic regression with just body weight as predictor
+log_cats1 <- glm( Sex_f~Bwt,family=binomial(link='logit'), data=train_cats) 
+summary(log_cats1)
+
+# Estimate the success rate of prediction
+cats_prob1 = predict(log_cats1, test_cats, type="response")
+cats_pred1 = rep("F", dim(train_cats)[1])
+cats_pred1[cats_prob1 > .5] = "M"
+table(cats_pred1, train_cats$Sex_f)
+
+mean(cats_pred1 == train_cats$Sex_f) 
+
+*AIC: 94.185 Residual deviance:  90.185*
+*The success rate of our predication is still 57.42574%, pretty similar almost the same as the previous one. 
+Therefore, we can reasonably assume that although Height does not negatively impact the results and fitting 
+of the model even thought Height does not have as much predictive ‘power’ as Body Weight.*
