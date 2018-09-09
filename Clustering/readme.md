@@ -1,1 +1,1 @@
-
+We will cluster the iris dataset to understand the structure of dataset via the already designed function so-called kmeans(). We also will design a program to visually determine the number of clusters.
