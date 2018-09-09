@@ -1,0 +1,70 @@
+library(flexclust)
+data("nutrient")
+head(nutrient)
+
+newnutri <- scale(nutrient)  # Scale the data
+d <- dist(newnutri, method = "euclidean")
+print(d)  # The pairwise distances between observations
+
+## We need to scale the data in order to standardize the variables. 
+## For example, the scale of energy, protein, fat, calcium and iron are different, 
+## for having better understanding of proportion of between variables, it is better to scale data.
+
+
+# Create various dendrograms using single, complete, and average linkage
+
+# Single-linkage clustering of the nutrient data
+hc1 <- hclust(d, method = "single")
+plot(hc1, cex = 0.6, hang = -1)
+
+# Complete-linkage clustering of the nutrient data
+hc2 <- hclust(d, method = "complete")
+plot(hc2, cex = 0.6, hang = -1)
+
+# Average-linkage clustering of the nutrient data
+hc3 <- hclust(d, method = "average")
+plot(hc3, cex = 0.6, hang = -1)
+
+
+# Cut the dendrogram into groups of 5
+
+# Single linkage
+grp1 <- cutree(hc1, k = 5)
+# Complete linkage
+grp2 <- cutree(hc2, k = 5)
+# Average linkage
+grp3 <- cutree(hc3, k = 5)
+
+
+# Describes clusters by single linkage method
+sing <- aggregate(newnutri, by = list(cluster = grp1), median)
+sing
+
+# Describes clusters by complete linkage method
+comp <- aggregate(newnutri, by = list(cluster = grp2), median)
+comp
+
+# Describes clusters by average linkage method
+aver <- aggregate(newnutri, by = list(cluster = grp3), median)
+aver
+
+## The results show that different methods in hierarchical clustering generate 5 different groups. 
+## The group median of complete and average methods are the same. With scaled data and their median, 
+## we could have better understanding of the composition of those nutrition variables.
+
+
+# Visualize the groups in the dendrogram
+plot(hc1, cex = 0.6, main = "Single Linkage Clustering\n5 Cluster Solution")
+rect.hclust(hc1, k = 5, border = 2:5)
+
+plot(hc2, cex = 0.6, main = "Complete Linkage Clustering\n5 Cluster Solution")
+rect.hclust(hc2, k = 5, border = 2:5)
+
+plot(hc3, cex = 0.6, main = "Average Linkage Clustering\n5 Cluster Solution")
+rect.hclust(hc3, k = 5, border = 2:5)
+
+## Discuss the common nutrient characteristics in each group. Among three methods, Beef heart/Sardnies canned/Clams raw 
+## and clams canned are always singleton. Take average linkage clustering for example: Beef heart is high in protein and 
+## iron. Sardnies canned has much higher in calcium than the other food groups. The clam cluster(clams raw and clams canned) 
+##is low in protein and high in iron. The group (beef roast to pork simmered) are high in energy and fat compared to other 
+## groups. The largest group (mackerel to bluefish) is relatively low in iron.
