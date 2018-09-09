@@ -1,0 +1,80 @@
+library(Sleuth2)
+data(case2002)
+
+# Explore data analysis
+head(case2002)
+Desc(case2002, plotit = FALSE)
+
+# Scatterplots of the continuous variables colored by LC or not
+pairs(case2002[, 5:7], col = case2002$LC)
+
+
+## In the scatterplots we can see more people tend to get lung cancer 
+## when YR (years of smoking) and AG (age) are increasing, 
+## while CD (average rate of smoking) 
+## seems doesn’t affect the lung cancer from the graph.
+
+
+# Preparing data
+set.seed(41)
+sample <- sample(c(TRUE, FALSE), nrow(case2002), replace = T, 
+    prob = c(0.8, 0.2))
+train <- case2002[sample, ]
+test <- case2002[!sample, ]
+
+--------
+
+# Logistic regression model1 with all varibales
+model1 <- glm(LC ~ ., family = "binomial", data = train)
+
+# Evaluate Logistic Regression model
+summary(model1)  # AIC: 129.55
+
+list(model1 = pscl::pR2(model1)["McFadden"])  # Look for 'McFadden', model1 is 0.1355796.
+
+predTst1 <- predict(model1, test, type = "response")  # Predicted results
+
+test.error = test %>% mutate(error = 0) %>% mutate(error = replace(error, 
+    LC == "LungCancer", 1))
+errors1 = mean((predTst1 - test.error$error)^2, na.rm = T)
+print(errors1)  # model1's Mean Squared Error on the testing set is 0.1939198
+
+
+## ‘McFadden’ measure ranges from 0 to just under 1, with values closer to zero 
+## indicating that the model has no predictive power. Model1 got 0.1355796, 
+## which is appropriate, not a high number but nothing to compare for now.
+
+---------
+
+# Logistic regression model2 except socioeconomic statu
+model2 <- glm(LC ~ . - SS, family = "binomial", data = train)
+
+predTst2 <- predict(model2, test, type = "response")  # Predicted results
+list(model2 = pscl::pR2(model2)["McFadden"])  # Model2 got 0.1299396 is appropriate.
+summary(model2)  # AIC: 128.3 
+
+errors2 = mean((predTst2 - test.error$error)^2, na.rm = T)
+print(errors2)  # model2's Mean Squared Error on the testing set is 0.1769595
+
+
+## Model2’s AIC is 128.3, Mean Squared Error on the testing set is 0.1769595, both are lowest among three models. 
+## Therefore, model2 is the best fit logistic regressiona.
+
+--------
+
+# Logistic regression model3 based on socioeconomic status and the number of smoking year
+model3 <- glm(LC ~ SS + YR, family = "binomial", data = train)
+summary(model3)  # AIC: 151.03 model2 has the highest AIC
+
+list(model3 = pscl::pR2(model3)["McFadden"])  # Look for 'McFadden', which is 0.07178801
+
+predTst3 <- predict(model3, test, type = "response")  # Predicted results
+
+errors3 = mean((predTst3 - test.error$error)^2, na.rm = T)
+print(errors3)  # Model3's Mean Squared Error on the testing set is 0.1844391
+
+
+## Model3 got 0.07178801 for ‘McFadden’, the value very closer to zero 
+## indicating that the model3 has no predictive power compared to prior two models. 
+## It has 0.1844391, the highest mean squared error among three models, and highest AIC. 
+## Therefore, model3 doesn’t fit.
