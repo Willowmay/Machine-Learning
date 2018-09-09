@@ -1,0 +1,99 @@
+data("iris")
+
+# Retrieve the numerical measures and standardize
+library(dplyr)
+newiris <- dplyr::select_if(iris, is.numeric)
+iris_s <- as.data.frame(apply(newiris, 2, function(x) (x - 
+    mean(x))/sd(x)))
+    
+# Use datatable to show the change of the standard deviation
+library("DT")
+sd_original <- apply(newiris, 2, sd)
+sd_scaled <- apply(iris_s, 2, sd)
+colt <- cbind(sd_original, sd_scaled)
+tog <- datatable(colt)
+show(tog)
+
+## After standardizing, iris data has been transformed so that standard deviation equal to 1 now for all four variables
+
+----------
+
+# Visualize the width and length measurements separately
+
+# Draw the petal width vs sepal width
+ggplot(data = iris_s, aes(x = Petal.Width, y = Sepal.Width)) + 
+    geom_point(aes(color = iris$Species))
+    
+# Draw the petal length vs the sepal length
+ggplot(data = iris_s, aes(x = Petal.Length, y = Sepal.Length)) + 
+    geom_point(aes(color = iris$Species))
+    
+## After visualizing the width and length measurements separately, 
+## I found out that petal width and petal length as no correlation, 
+## but petal length and sepal length tend to have correlation. Since the shape of dots are pretty close to a line. 
+## And size of three species: setosa is the smallest one, versicolor is the middle and virginica is 
+## the largest among three with both longest length and widest width in sepal and petal.
+
+-----------
+
+# K-means algorithm
+
+set.seed(101)
+result <- kmeans(iris_s, centers = 3, nstart = 25)  # apply k-means algorithm with k=3
+result$size  # gives no. of records in each cluster
+
+result$centers  # gives value of cluster center datapoint value (3 centers for k=3)
+result$cluster  # gives cluster vector showing the custer where each record falls
+str(result)
+
+# Inspect the output
+result
+
+# total within-cluster variance calculation
+result$tot.withinss
+
+##Total within-cluster variance from K-means clustering with 3 clusters of sizes 53, 50, 47 result is 138.8884
+
+
+# Visualize the results against the truth
+iris.class <- iris[, "Species"]
+par(mfrow = c(2, 2), mar = c(5, 4, 2, 2))
+plot(iris_s[c(1, 2)], col = result$cluster)  # Plot to see how Sepal.Length and Sepal.Width data points have been distributed in clusters
+plot(iris_s[c(1, 2)], col = iris.class)  # Plot to see how Sepal.Length and Sepal.Width data points have been distributed originally as per 'class' attribute in dataset
+plot(iris_s[c(3, 4)], col = result$cluster)  # Plot to see how Petal.Length and Petal.Width data points have been distributed in clusters
+plot(iris_s[c(3, 4)], col = iris.class)
+
+# Sepal width and length plot with cluser centers
+plot(iris_s[c(1, 2)], col = result$cluster)
+points(result$centers[, 1:2], col = "blue", pch = 8, cex = 2)
+
+# Petal width and length plot with cluser centers
+plot(iris_s[c(3, 4)], col = result$cluster)
+points(result$centers[, 3:4], col = "blue", pch = 8, cex = 2)
+
+----------
+
+# Determine the plausible number of clusters
+
+set.seed(139)
+# Build function to compute total within-cluster sum of
+# square
+wcss <- function(k) {
+    kmeans(iris_s, k, nstart = 25)$tot.withinss
+}
+
+# Compute and plot wss for k = 1 to 8
+k_values <- 1:8
+
+# Extract wss for 2-7 clusters
+wss_values <- map_dbl(k_values, wcss)
+
+plot(k_values, wss_values, type = "b", pch = 19, frame = FALSE, 
+    xlab = "Number of clusters K", ylab = "Total within-clusters sum of squares")
+abline(v = 3, lty = 2)
+
+fviz_nbclust(newiris, kmeans, method = c("wss")) + geom_vline(xintercept = 3, 
+    linetype = 2)
+    
+##  I find that 3 clusters are optimal using this method, since the location of a bend (knee) 
+in the plot is generally considered as an indicator of the appropriate number of clusters
