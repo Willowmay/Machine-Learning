@@ -1,0 +1,42 @@
+head(cigdata)
+str(cigdata) # Verify qualitative and quantitative variables
+
+# Determine the highest and lowest sales state
+hs<- subset(cigdata, Sales == max(Sales))
+hs$State 
+ls<- subset(cigdata, Sales == min(Sales))
+ls$State
+
+# Estimate the average and standard deviation of age, price, and income
+mycol<- c("Age", "Price", "Income")
+newcig<-cigdata[mycol]
+sapply(newcig, function(x) c("Stand dev" = sd(x), "Mean"= mean(x,na.rm=TRUE)))
+
+# Scatterplot matrix to identify correlated variables with sales
+pairs(cigdata[,-1], pch = 19, panel=panel.smooth)
+
+*Highest sales state: NH; lowest sales state: UT *
+*From the scatterplot, I think correlated variables with sales are age, income and price*
+
+-------
+
+# Multiple linear regression
+lmd<- lm(Sales~Age+HS+Income+Black+Female+Price, data=cigdata)
+summary(lmd)
+
+*I didn't take state into the multiple linear regression model since it is a factor varaible.*
+*Summary of the fit: RSE of the model is 28.17 on 44 degrees of freedom, which is not a small number. 
+The quality of a linear regression seems not so fit. The p-value is 0.006857, which is larger than 5%, 
+therefore the linear model is not going to be statistically significant. Multiple R-Squared and 
+Adjusted R-squared would be higher(> 0.70) the better, the value is low for the model.*
+
+summary(lmd) # find coefficients of price
+
+*The coefficient of price in the linear regression model is -3.25492, 
+so when the price goes up by a dollar per carton, 
+sales will drop 3.25492 if other variables remain the same.*
+
+mean(cigdata[,"Female"])
+
+*The mean of female buyers in those states is 50.95098, which is more than 50%, so females buy more cigarette in all.*
+
