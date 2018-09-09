@@ -1,0 +1,57 @@
+ Cluster the *iris* data set via kmean
+ 
+ # calculate the euclidean distance 
+euclid <- function(points1, points2) {
+  distanceMatrix <- matrix(NA, nrow=dim(points1)[1], ncol=dim(points2)[1])
+  for(i in 1:nrow(points2)) {
+    distanceMatrix[,i] <- sqrt(rowSums(t(t(points1)-points2[i,])^2))
+  }
+  distanceMatrix
+}
+
+# calculate the within cluster variance
+mahattan <- function(x, y) {
+    distanceMatrix <- matrix(NA, nrow = dim(x)[1], ncol = dim(y)[1])
+    for (i in 1:nrow(y)) {
+        distanceMatrix[, i] <- rowSums(sqrt(t(t(x) - y[i, 
+            ])^2))
+    }
+    distanceMatrix
+}
+
+K_means <- function(x, centers, distFun, nItter) {
+    clusterHistory <- vector(nItter, mode = "list")
+    centerHistory <- vector(nItter, mode = "list")
+    
+    for (i in 1:nItter) {
+        distsToCenters <- distFun(x, centers)
+        clusters <- apply(distsToCenters, 1, which.min)
+        centers <- apply(x, 2, tapply, clusters, mean)
+        # Saving history
+        clusterHistory[[i]] <- clusters
+        centerHistory[[i]] <- centers
+    }
+    
+    list(clusters = clusterHistory, centers = centerHistory)
+}
+
+iris.scale <- as.data.frame(scale(iris[, 1:4]))
+test=iris.scale # A data.frame
+ktest=as.matrix(test) # Turn into a matrix
+centers <- ktest[sample(nrow(ktest), 10),] # Sample 10 centers for example
+
+res <- K_means(ktest, centers, euclid, 10)
+
+km.iris = kmeans(iris.scale, centers = 3)
+
+par(mfrow = c(1, 1))
+plot(iris.scale$Petal.Width, iris.scale$Sepal.Width, xlab = "Petal Width", 
+    ylab = "Sepal Width", main = "Single K-Means Attempt", 
+    col = km.iris$cluster)
+points(km.iris$centers[, 4], km.iris$centers[, 2], pch = 16, 
+    col = "blue")
+points(res$centers[[1]][, 4], res$centers[[1]][, 2], pch = 16, 
+    col = "red")
+points(centers[, 4], centers[, 2], pch = 16, col = "green")
+legend(1.1, 3.3, c("kmean", "k_means", "init. C"), pch = 16, 
+    col = c("blue", "red", "green"))
