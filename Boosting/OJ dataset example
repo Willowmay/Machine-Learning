@@ -1,0 +1,7 @@
+# Boosting
+
+
+I use the *OJ* dataset from the **ISLR** library.
+
+In order to boost with classification trees, I do a bit of data munging to transform the response variable. 
+
