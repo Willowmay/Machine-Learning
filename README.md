@@ -6,15 +6,24 @@ suprised by looking into history data will shed light on new impactful thoughts.
 
 This repository covers most commonly used supervised learning algorithms and standard techniques to improve classifier performance, as I shared here, which also introduces modern deep learning techniques:
 
-*Supervised Learning – k-Nearest Neighbors and Linear Regression
+Supervised Learning – k-Nearest Neighbors and Linear Regression
+
 Clustering
+
 Perception and Logistic Regression
+
 Classification: Discriminant Analyses and Naïve Bayes
+
 Resampling Methods for Model Assessment and Selection
+
 Regularized Regression and Decision Trees
+
 Bagging, Random Forests, and Boosting
+
 Support Vector Machines
+
 Neural Networks
+
 Deep Learning – Convolutional Neural Networks
 
 
