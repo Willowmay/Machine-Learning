@@ -1,0 +1,72 @@
+
+OJ.train.indicator = train_j 
+OJ.test.indicator = test_j
+OJ.train.indicator$Purchase = as.vector(train_j$Purchase, mode = "numeric") - 1
+OJ.test.indicator$Purchase = as.vector(test_j$Purchase, mode = "numeric") - 1
+
+
+## Construct an initial boosted model 
+set.seed(0)
+boost.oj <- gbm(Purchase~., data = OJ.train.indicator, distribution = "bernoulli", n.trees = 10000, interaction.depth = 4, shrinkage = 0.001 )
+summary(boost.oj)
+
+
+## Predictive modeling
+trees.group <- seq(from=100, to=10000, by=100) # using the initial boosted model across up to 10,000 trees, considering groups of 100 trees at a time
+boost_pred <- predict(boost.oj, newdata = OJ.test.indicator, n.trees = trees.group, type = "response")
+pre_ojtest<- round(boost_pred, digits = 2) # round the ultimate predictions
+
+
+## Calculate and store the accuracy for each of the 100 models
+oj.pred <- ifelse( boost_pred > 0.5, 1, 0)
+
+acc_oj<- function(x){
+  tes <-mean(oj.pred[,x]==OJ.test.indicator$Purchase)
+  return(tes)
+}
+
+m<-1:100
+acc.rate<-sapply(m,acc_oj,simplify = TRUE)
+acc.rate<-data.frame(acc.rate)
+acc_res1 <- cbind(trees.group, acc.rate)
+print(acc_res1)# Accuracy rate of predication for each of the 100 models
+min(acc_res1$trees.group[which.max(acc_res1$acc.rate)]) # minimum number of trees required to reach the maximum accuracy
+```
+*2100 is the minimum number of trees required to reach the maximum accuracy.*
+
+
+
+## Plot the accuracies found in part 4 against the number of trees
+
+# Pruned decision tree
+tree4 <- tree(as.factor(Purchase)~., data = OJ.train.indicator)
+
+cvtree4 <- cv.tree(tree4, FUN = prune.misclass)
+plot(cvtree4)
+cvtree4$size[which.min(cvtree4$dev)]
+cvtree4  # find the lowest deviance
+plot(cvtree4$size, cvtree4$dev, type = "b")
+
+tree4_pru1 <- prune.misclass(tree4, best = 8) 
+plot(tree4_pru1)
+text(tree4_pru1, pretty=0)
+
+pre1_oj4 <- predict(tree4_pru1, data = OJ.test.indicator, type = "class") # predict when prune number is 8
+
+pru1_acc4<- mean(pre1_oj4==OJ.test.indicator$Purchase)  # pruned decision tree accuracy on the test set
+print(pru1_acc4)
+
+tree4_pru2 <- prune.misclass(tree4, best = 7)
+plot(tree4_pru2)
+text(tree4_pru2, pretty=0)
+
+pre2_oj4 <- predict(tree4_pru2, data = OJ.test.indicator, type = "class") # predict when prune number is 7
+
+pru2_acc4<- mean(pre2_oj4==OJ.test.indicator$Purchase)  # pruned decision tree accuracy on the test set
+print(pru2_acc4)
+
+plot(acc_res1, pch = 18, ylab = "Accuracy", xlab = "number of Trees", main = "Boosting Performance", ylim = c(0.35, 0.85))
+abline(h= max(acc_res1$acc.rate), col= "orange" ) # the best boosted accuracy line on the test set
+abline(h= Acc_maxi, col= "blue" ) # the best random forest accuracy on the test set
+abline(h= pru1_acc4, col= "pink" ) # the best pruned decision tree accuracy on the test set
+
