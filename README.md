@@ -1,8 +1,7 @@
 # Machine-Learning
 
 
-One year ago, I am a new student with little programming knowledge, but now I feel very comfortable with data and always be
-suprised by looking into history data will shed light on new impactful thoughts. 2018 summer, I finished machine learning course at Columbia University successfully with the highest score in class. 
+When I was a new grad student on 2017, I had very little programming knowledge.  2018 summer, I finished machine learning course at Columbia University successfully with the highest score in class. While now I feel very comfortable with data and always be suprised by looking into history data will shed light on new impactful thoughts.
 
 This repository covers most commonly used supervised learning algorithms and standard techniques to improve classifier performance, as I shared here, which also introduces modern deep learning techniques:
 
